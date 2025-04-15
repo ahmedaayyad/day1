@@ -6,23 +6,26 @@ import {
 } from './userFunctions.js';
 import { users, sampleUser } from './data.js';
 
-// Function to initialize users table
+// Function to initialize users table (Data Transformation)
 function initUsersTable(processedUsers, tableElement) {
     processedUsers.forEach((user, index) => {
         const row = document.createElement('tr');
+        // Destructuring user object for cleaner code
+        const { id, fullName, email } = user;
         row.innerHTML = `
-            <td>${user.id}</td>
-            <td>${user.fullName}</td>
-            <td>${user.email}</td>
-            <td><button class="action-btn view-btn" data-index="${index}">View</button></td>
+            <td>${id}</td>
+            <td>${fullName}</td>
+            <td>${email}</td>
+            <td><button class="action-btn view-btn" data-index="${index}" aria-label="View user ${fullName}">View</button></td>
         `;
         tableElement.appendChild(row);
     });
 }
 
-// Function to display user posts
+// Function to display user posts (Async Data Fetching with Promises)
 function displayUserPosts(postsListElement, postTitles) {
     postsListElement.innerHTML = '';
+    // Using arrow functions and modern array methods
     postTitles.slice(0, 8).forEach((title) => {
         const li = document.createElement('li');
         li.textContent = `${title.substring(0, 50)}${title.length > 50 ? '...' : ''}`;
@@ -30,12 +33,13 @@ function displayUserPosts(postsListElement, postTitles) {
     });
 }
 
-// Function to handle profile updates
+// Function to handle profile updates (React-like pattern: state update triggers UI re-render)
 function handleProfileUpdate(profileElement, user, logFn) {
     profileElement.innerHTML = createUserProfileHTML(user);
     const toggleBtn = profileElement.querySelector('.toggle-status-btn');
     if (toggleBtn) {
         toggleBtn.addEventListener('click', () => {
+            // Toggle state and re-render
             user.active = !user.active;
             handleProfileUpdate(profileElement, user, logFn);
             logFn(`User status toggled: ${user.fullName} is now ${user.active ? 'Active' : 'Inactive'}`);
@@ -43,20 +47,21 @@ function handleProfileUpdate(profileElement, user, logFn) {
     }
 }
 
-// Function to handle view button clicks
+// Function to handle view button clicks (Event handling with arrow functions)
 function setupViewButtons(processedUsers, profileElement, logFn) {
     document.querySelectorAll('.view-btn').forEach(button => {
         button.addEventListener('click', (e) => {
             const index = e.target.getAttribute('data-index');
-            const selectedUser = processedUsers[index];
+            const { id, fullName, email } = processedUsers[index]; // Destructuring
+            const [first, last = ''] = fullName.split(' '); // Destructuring with default value
             const featuredUser = {
-                id: selectedUser.id,
-                first: selectedUser.fullName.split(' ')[0],
-                last: selectedUser.fullName.split(' ')[1] || '',
-                email: selectedUser.email,
+                id,
+                first,
+                last,
+                email,
                 position: 'Team Member',
                 active: true,
-                fullName: selectedUser.fullName
+                fullName
             };
             handleProfileUpdate(profileElement, featuredUser, logFn);
             logFn(`User displayed: ${featuredUser.fullName}`);
@@ -64,21 +69,22 @@ function setupViewButtons(processedUsers, profileElement, logFn) {
     });
 }
 
-// Function to manage state updates
-function setupStateManagement(stateElements, stateManager, logFn) {
-    stateElements.initial.textContent = JSON.stringify(stateManager.getState(), null, 2);
-    stateElements.current.textContent = JSON.stringify(stateManager.getState(), null, 2);
+// Function to manage state updates (State Management with React-like subscription pattern)
+function setupStateManagement({ initial, current }, stateManager, logFn) {
+    initial.textContent = JSON.stringify(stateManager.getState(), null, 2);
+    current.textContent = JSON.stringify(stateManager.getState(), null, 2);
     
     stateManager.subscribe((state) => {
-        stateElements.current.textContent = JSON.stringify(state, null, 2);
-        logFn(`Status updated: ${JSON.stringify(state)}`);
+        current.textContent = JSON.stringify(state, null, 2);
+        logFn(`State updated: ${JSON.stringify(state)}`);
     });
 
+    // Simulate state updates over time
     setTimeout(() => stateManager.setState({ status: 'Active' }), 1000);
     setTimeout(() => stateManager.setState({ lastSeen: new Date().toLocaleString() }), 2000);
 }
 
-// Function to handle logging
+// Function to handle logging (Utility function with closure)
 function createLogger(consoleElement) {
     const logMessages = [];
     return (message) => {
@@ -96,20 +102,20 @@ function formatLogs(consoleElement, logMessages) {
     consoleElement.scrollTop = consoleElement.scrollHeight;
 }
 
-// Function to export data
+// Function to export data (Async/Await)
 async function exportData(consoleElement, processedUsers, currentUser, stateManager, logFn) {
-    const posts = await fetchUserPosts(1).catch(() => []);
+    const posts = await fetchUserPosts(1).catch(() => []); // Using async/await
     consoleElement.textContent = `
-Processed Users: ${JSON.stringify(processedUsers, null, 2)}
-User Profile HTML: ${createUserProfileHTML(currentUser)}
+Team Members: ${JSON.stringify(processedUsers, null, 2)}
+User Profile: ${createUserProfileHTML(currentUser)}
 Initial State: ${JSON.stringify(stateManager.getState(), null, 2)}
-User Posts: ${JSON.stringify(posts.slice(0, 8), null, 2)}
+Recent Posts: ${JSON.stringify(posts.slice(0, 8), null, 2)}
     `;
     consoleElement.scrollTop = consoleElement.scrollHeight;
     logFn('Data exported');
 }
 
-// Function to handle refresh
+// Function to handle refresh (Async Data Fetching with Promises)
 function handleRefresh(postsListElement, logFn) {
     logFn('Data refreshed');
     fetchUserPosts(1)
@@ -120,13 +126,13 @@ function handleRefresh(postsListElement, logFn) {
         .catch((error) => logFn(`Refresh error: ${error}`));
 }
 
-// Main initialization function
+// Main initialization function (Orchestrates the app)
 function initializeApp() {
     const processedUsers = processUserData(users);
     const usersTable = document.getElementById('processed-users');
     const postsList = document.getElementById('user-posts');
     const profileDisplay = document.getElementById('user-profile');
-    const consoleOutput = document.getElementById('console-output');
+    const consoleOutput = document.querySelector('.logs-card pre');
     const stateElements = {
         initial: document.getElementById('initial-state'),
         current: document.getElementById('current-state')
@@ -146,7 +152,7 @@ function initializeApp() {
 
     // Initial logs
     log('System initialized');
-    log(`Loaded ${processedUsers.length} active users`);
+    log(`Loaded ${processedUsers.length} team members`);
     fetchUserPosts(1)
         .then((titles) => log(`Fetched ${titles.length} posts`))
         .catch((error) => log(`Error fetching posts: ${error}`));
