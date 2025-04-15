@@ -3,6 +3,10 @@ import { users, sampleUser } from './data.js';
 
 const initUsersTable = (processedUsers, tableElement) => {
     console.log('Initializing users table with:', processedUsers);
+    if (!tableElement) {
+        console.error('Users table element not found');
+        return;
+    }
     processedUsers.forEach((user, index) => {
         const { id, fullName, email } = user;
         const row = document.createElement('tr');
@@ -19,7 +23,15 @@ const initUsersTable = (processedUsers, tableElement) => {
 
 const displayUserPosts = (postsListElement, postTitles) => {
     console.log('Displaying posts:', postTitles);
+    if (!postsListElement) {
+        console.error('Posts list element not found');
+        return;
+    }
     postsListElement.innerHTML = '';
+    if (!postTitles || postTitles.length === 0) {
+        postsListElement.innerHTML = '<li>No posts available</li>';
+        return;
+    }
     postTitles.slice(0, 8).forEach((title) => {
         const li = document.createElement('li');
         li.textContent = `${title.substring(0, 50)}${title.length > 50 ? '...' : ''}`;
@@ -30,6 +42,14 @@ const displayUserPosts = (postsListElement, postTitles) => {
 
 const handleProfileUpdate = (profileElement, user, logFn) => {
     console.log('Updating profile for user:', user);
+    if (!profileElement) {
+        console.error('Profile element not found');
+        return;
+    }
+    if (!user) {
+        profileElement.innerHTML = '<p>No user selected</p>';
+        return;
+    }
     profileElement.innerHTML = createUserProfileHTML(user);
     const toggleBtn = profileElement.querySelector('.toggle-status-btn');
     if (toggleBtn) {
@@ -60,6 +80,10 @@ const setupViewButtons = (processedUsers, profileElement, logFn) => {
 
 const setupStateManagement = ({ initial, current }, stateManager, logFn) => {
     console.log('Setting up state management with initial state:', stateManager.getState());
+    if (!initial || !current) {
+        console.error('State elements not found:', { initial, current });
+        return;
+    }
     initial.textContent = JSON.stringify(stateManager.getState(), null, 2);
     current.textContent = JSON.stringify(stateManager.getState(), null, 2);
     stateManager.subscribe((state) => {
@@ -68,6 +92,7 @@ const setupStateManagement = ({ initial, current }, stateManager, logFn) => {
     });
     setTimeout(() => stateManager.setState({ status: 'Active' }), 1000);
     setTimeout(() => stateManager.setState({ lastSeen: new Date().toLocaleString() }), 2000);
+    console.log('State management setup complete');
 };
 
 const createLogger = (consoleElement) => {
@@ -75,8 +100,10 @@ const createLogger = (consoleElement) => {
     return (message) => {
         const time = new Date().toLocaleTimeString();
         logMessages.push({ time, message });
-        consoleElement.textContent += `${time} - ${message}\n`;
-        consoleElement.scrollTop = consoleElement.scrollHeight;
+        if (consoleElement) {
+            consoleElement.textContent += `${time} - ${message}\n`;
+            consoleElement.scrollTop = consoleElement.scrollHeight;
+        }
         console.log(`Log: ${time} - ${message}`);
         return logMessages;
     };
@@ -84,12 +111,20 @@ const createLogger = (consoleElement) => {
 
 const formatLogs = (consoleElement, logMessages) => {
     console.log('Formatting logs:', logMessages);
+    if (!consoleElement) {
+        console.error('Console element not found');
+        return;
+    }
     consoleElement.textContent = logMessages.map(msg => `${msg.time} - ${msg.message}`).join('\n');
     consoleElement.scrollTop = consoleElement.scrollHeight;
 };
 
 const exportData = async (consoleElement, processedUsers, currentUser, stateManager, logFn) => {
     console.log('Exporting data...');
+    if (!consoleElement) {
+        console.error('Console element not found');
+        return;
+    }
     const posts = await fetchUserPosts(1);
     consoleElement.textContent = `
 Team Members: ${JSON.stringify(processedUsers, null, 2)}
@@ -122,8 +157,8 @@ const initializeApp = async () => {
     const stateElements = { initial: document.getElementById('initial-state'), current: document.getElementById('current-state') };
     let currentFeaturedUser = sampleUser;
 
-    if (!usersTable || !postsList || !profileDisplay || !consoleOutput) {
-        console.error('One or more DOM elements not found:', { usersTable, postsList, profileDisplay, consoleOutput });
+    if (!usersTable || !postsList || !profileDisplay || !consoleOutput || !stateElements.initial || !stateElements.current) {
+        console.error('One or more DOM elements not found:', { usersTable, postsList, profileDisplay, consoleOutput, stateElements });
         return;
     }
 
@@ -141,6 +176,7 @@ const initializeApp = async () => {
         displayUserPosts(postsList, titles);
     } catch (error) {
         log(`Error fetching posts: ${error.message}`);
+        displayUserPosts(postsList, []); // Fallback to display "No posts available"
     }
 
     handleProfileUpdate(profileDisplay, currentFeaturedUser, log);
@@ -156,4 +192,7 @@ const initializeApp = async () => {
     document.querySelector('.refresh-btn').addEventListener('click', () => handleRefresh(postsList, log));
 };
 
-initializeApp().catch(error => console.error('App initialization failed:', error));
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM fully loaded, starting app...');
+    initializeApp().catch(error => console.error('App initialization failed:', error));
+});
