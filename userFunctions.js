@@ -1,15 +1,18 @@
 export const processUserData = (users) => users.map(user => ({ ...user, active: true }));
 
-// Fetch actual user posts from JSONPlaceholder API
 export const fetchUserPosts = async (userId) => {
     try {
+        console.log(`Fetching posts for userId: ${userId}`); // Debug log
         const response = await fetch(`https://jsonplaceholder.typicode.com/posts?userId=${userId}`);
-        if (!response.ok) throw new Error('Failed to fetch posts');
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
         const posts = await response.json();
-        return posts.map(post => post.title); // Extract and return post titles
+        console.log(`Fetched ${posts.length} posts for userId ${userId}:`, posts); // Debug log
+        return posts.map(post => post.title);
     } catch (error) {
-        console.error('Error fetching posts:', error);
-        return []; // Return empty array on error
+        console.error(`Error fetching posts for userId ${userId}:`, error.message); // Debug log
+        return [];
     }
 };
 
