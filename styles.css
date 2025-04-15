@@ -1,12 +1,12 @@
 :root {
-    --primary: #1e3a8a; /* Deep blue for primary elements */
-    --secondary: #10b981; /* Vibrant green for accents */
-    --inactive: #6b7280; /* Neutral gray for inactive states */
-    --profile-frame: #3b82f6; /* Bright blue for profile highlights */
-    --background: #f3f4f6; /* Light gray background */
-    --card-bg: #ffffff; /* White for cards */
-    --text: #111827; /* Dark gray for text */
-    --text-light: #9ca3af; /* Lighter gray for secondary text */
+    --primary: #1e3a8a;
+    --secondary: #10b981;
+    --inactive: #6b7280;
+    --profile-frame: #3b82f6;
+    --background: #f3f4f6;
+    --card-bg: #ffffff;
+    --text: #111827;
+    --text-light: #9ca3af;
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
     --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
@@ -293,7 +293,6 @@ tr:hover {
     background: #1e40af;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
     .dashboard-container {
         padding: 1rem;
