@@ -64,8 +64,8 @@ body {
 }
 
 .dashboard-main {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: 1.5rem;
 }
 
@@ -299,7 +299,7 @@ tr:hover {
     }
 
     .dashboard-main {
-        grid-template-columns: 1fr;
+        flex-direction: column;
     }
 
     .dashboard-card {
