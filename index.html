@@ -20,34 +20,37 @@
         </header>
 
         <main class="dashboard-main">
+            <!-- Team Members Section -->
             <section class="dashboard-card team-card" aria-labelledby="team-heading">
                 <h2 id="team-heading">Team Members</h2>
-<!-- Inside the team-card section -->
-<div class="table-container">
-    <table role="grid">
-        <thead>
-            <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Name</th>
-                <th scope="col">Email</th>
-                <th scope="col">Actions</th>
-            </tr>
-        </thead>
-        <tbody id="processed-users"></tbody>
-    </table>
-</div>
+                <div class="table-container">
+                    <table role="grid">
+                        <thead>
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="processed-users"></tbody>
+                    </table>
+                </div>
             </section>
 
+            <!-- Recent Posts Section (Moved under Team Members) -->
             <section class="dashboard-card activity-card" aria-labelledby="activity-heading">
                 <h2 id="activity-heading">Recent Posts</h2>
                 <ul id="user-posts" class="posts-list" role="list"></ul>
             </section>
 
+            <!-- User Profile Section -->
             <section class="dashboard-card profile-card" aria-labelledby="profile-heading">
                 <h2 id="profile-heading">User Profile</h2>
                 <div id="user-profile" class="profile-content"></div>
             </section>
 
+            <!-- System State Section -->
             <section class="dashboard-card state-card" aria-labelledby="state-heading">
                 <h2 id="state-heading">System State</h2>
                 <div class="state-container">
@@ -62,6 +65,7 @@
                 </div>
             </section>
 
+            <!-- System Logs Section -->
             <section class="dashboard-card logs-card" aria-labelledby="logs-heading">
                 <h2 id="logs-heading">System Logs</h2>
                 <div class="logs-controls">
