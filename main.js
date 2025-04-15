@@ -1,14 +1,13 @@
 import { processUserData, fetchUserPosts, createUserProfileHTML, createStateManager } from './userFunctions.js';
 import { users, sampleUser } from './data.js';
 
-// Function to initialize users table (Data Transformation) - Added avatar column
 const initUsersTable = (processedUsers, tableElement) => {
     processedUsers.forEach((user, index) => {
-        const { id, fullName, email, avatar } = user; // Destructuring
+        const { id, fullName, email } = user;
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${id}</td>
-            <td><img src="${avatar}" alt="Avatar of ${fullName}" class="table-avatar" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 8px; vertical-align: middle;">${fullName}</td>
+            <td>${fullName}</td>
             <td>${email}</td>
             <td><button class="action-btn view-btn" data-index="${index}" aria-label="View user ${fullName}">View</button></td>
         `;
@@ -16,7 +15,6 @@ const initUsersTable = (processedUsers, tableElement) => {
     });
 };
 
-// Function to display user posts (Async Data Fetching with Promises)
 const displayUserPosts = (postsListElement, postTitles) => {
     postsListElement.innerHTML = '';
     postTitles.slice(0, 8).forEach((title) => {
@@ -26,7 +24,6 @@ const displayUserPosts = (postsListElement, postTitles) => {
     });
 };
 
-// Function to handle profile updates (React-like pattern: state update triggers UI re-render)
 const handleProfileUpdate = (profileElement, user, logFn) => {
     profileElement.innerHTML = createUserProfileHTML(user);
     const toggleBtn = profileElement.querySelector('.toggle-status-btn');
@@ -39,12 +36,11 @@ const handleProfileUpdate = (profileElement, user, logFn) => {
     }
 };
 
-// Function to handle view button clicks (Event handling with arrow functions)
 const setupViewButtons = (processedUsers, profileElement, logFn) => {
     document.querySelectorAll('.view-btn').forEach(button => {
         button.addEventListener('click', (e) => {
             const index = e.target.getAttribute('data-index');
-            const { id, fullName, email, avatar } = processedUsers[index]; // Destructuring
+            const { id, fullName, email, avatar } = processedUsers[index];
             const [first, last = ''] = fullName.split(' ');
             const featuredUser = { id, first, last, email, position: 'Team Member', active: true, fullName, avatar };
             handleProfileUpdate(profileElement, featuredUser, logFn);
@@ -53,7 +49,6 @@ const setupViewButtons = (processedUsers, profileElement, logFn) => {
     });
 };
 
-// Function to manage state updates (State Management with React-like subscription pattern)
 const setupStateManagement = ({ initial, current }, stateManager, logFn) => {
     initial.textContent = JSON.stringify(stateManager.getState(), null, 2);
     current.textContent = JSON.stringify(stateManager.getState(), null, 2);
@@ -65,7 +60,6 @@ const setupStateManagement = ({ initial, current }, stateManager, logFn) => {
     setTimeout(() => stateManager.setState({ lastSeen: new Date().toLocaleString() }), 2000);
 };
 
-// Function to handle logging (Utility function with closure)
 const createLogger = (consoleElement) => {
     const logMessages = [];
     return (message) => {
@@ -77,13 +71,11 @@ const createLogger = (consoleElement) => {
     };
 };
 
-// Function to format logs
 const formatLogs = (consoleElement, logMessages) => {
     consoleElement.textContent = logMessages.map(msg => `${msg.time} - ${msg.message}`).join('\n');
     consoleElement.scrollTop = consoleElement.scrollHeight;
 };
 
-// Function to export data (Async/Await)
 const exportData = async (consoleElement, processedUsers, currentUser, stateManager, logFn) => {
     const posts = await fetchUserPosts(1).catch(() => []);
     consoleElement.textContent = `
@@ -96,7 +88,6 @@ Recent Posts: ${JSON.stringify(posts.slice(0, 8), null, 2)}
     logFn('Data exported');
 };
 
-// Function to handle refresh (Async Data Fetching with Promises)
 const handleRefresh = (postsListElement, logFn) => {
     logFn('Data refreshed');
     fetchUserPosts(1)
@@ -107,7 +98,6 @@ const handleRefresh = (postsListElement, logFn) => {
         .catch((error) => logFn(`Refresh error: ${error}`));
 };
 
-// Main initialization function (Orchestrates the app)
 const initializeApp = () => {
     const processedUsers = processUserData(users);
     const usersTable = document.getElementById('processed-users');
@@ -137,5 +127,4 @@ const initializeApp = () => {
     document.querySelector('.refresh-btn').addEventListener('click', () => handleRefresh(postsList, log));
 };
 
-// Start the application
 initializeApp();
