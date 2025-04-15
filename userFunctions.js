@@ -2,23 +2,26 @@ export const processUserData = (users) => users.map(user => ({ ...user, active: 
 
 export const fetchUserPosts = async (userId) => {
     try {
-        console.log(`Fetching posts for userId: ${userId}`); // Debug log
+        console.log(`Fetching posts for userId: ${userId}`);
         const response = await fetch(`https://jsonplaceholder.typicode.com/posts?userId=${userId}`);
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const posts = await response.json();
-        console.log(`Fetched ${posts.length} posts for userId ${userId}:`, posts); // Debug log
+        console.log(`Fetched ${posts.length} posts for userId ${userId}:`, posts);
         return posts.map(post => post.title);
     } catch (error) {
-        console.error(`Error fetching posts for userId ${userId}:`, error.message); // Debug log
+        console.error(`Error fetching posts for userId ${userId}:`, error.message);
         return [];
     }
 };
 
-export const createUserProfileHTML = (user) => `
+export const createUserProfileHTML = (user) => {
+    // Generate a random avatar using DiceBear with the user's fullName as the seed
+    const avatarUrl = `https://api.dicebear.com/9.x/identicon/svg?seed=${encodeURIComponent(user.fullName)}`;
+    return `
     <div class="profile-card">
-        <img src="${user.avatar}" alt="Profile picture of ${user.fullName}" class="profile-pic${!user.active ? ' status-inactive' : ''}">
+        <img src="${avatarUrl}" alt="Profile picture of ${user.fullName}" class="profile-pic${!user.active ? ' status-inactive' : ''}">
         <div class="profile-info">
             <h3>${user.fullName}</h3>
             <p>Email: ${user.email}</p>
@@ -30,6 +33,7 @@ export const createUserProfileHTML = (user) => `
         </button>
     </div>
 `;
+};
 
 export const createStateManager = (initialState) => {
     let state = { ...initialState };
