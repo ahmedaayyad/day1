@@ -2,7 +2,7 @@ import { processUserData, fetchUserPosts, createUserProfileHTML, createStateMana
 import { users, sampleUser } from './data.js';
 
 const initUsersTable = (processedUsers, tableElement) => {
-    console.log('Initializing users table with:', processedUsers); // Debug log
+    console.log('Initializing users table with:', processedUsers);
     processedUsers.forEach((user, index) => {
         const { id, fullName, email } = user;
         const row = document.createElement('tr');
@@ -14,22 +14,22 @@ const initUsersTable = (processedUsers, tableElement) => {
         `;
         tableElement.appendChild(row);
     });
-    console.log('Users table initialized:', tableElement.innerHTML); // Debug log
+    console.log('Users table initialized:', tableElement.innerHTML);
 };
 
 const displayUserPosts = (postsListElement, postTitles) => {
-    console.log('Displaying posts:', postTitles); // Debug log
+    console.log('Displaying posts:', postTitles);
     postsListElement.innerHTML = '';
     postTitles.slice(0, 8).forEach((title) => {
         const li = document.createElement('li');
         li.textContent = `${title.substring(0, 50)}${title.length > 50 ? '...' : ''}`;
         postsListElement.appendChild(li);
     });
-    console.log('Posts list updated:', postsListElement.innerHTML); // Debug log
+    console.log('Posts list updated:', postsListElement.innerHTML);
 };
 
 const handleProfileUpdate = (profileElement, user, logFn) => {
-    console.log('Updating profile for user:', user); // Debug log
+    console.log('Updating profile for user:', user);
     profileElement.innerHTML = createUserProfileHTML(user);
     const toggleBtn = profileElement.querySelector('.toggle-status-btn');
     if (toggleBtn) {
@@ -39,19 +39,19 @@ const handleProfileUpdate = (profileElement, user, logFn) => {
             logFn(`User status toggled: ${user.fullName} is now ${user.active ? 'Active' : 'Inactive'}`);
         });
     }
-    console.log('Profile updated:', profileElement.innerHTML); // Debug log
+    console.log('Profile updated:', profileElement.innerHTML);
 };
 
 const setupViewButtons = (processedUsers, profileElement, logFn) => {
-    console.log('Setting up view buttons for users:', processedUsers); // Debug log
+    console.log('Setting up view buttons for users:', processedUsers);
     const buttons = document.querySelectorAll('.view-btn');
-    console.log('Found view buttons:', buttons); // Debug log
+    console.log('Found view buttons:', buttons);
     buttons.forEach(button => {
         button.addEventListener('click', (e) => {
             const index = e.target.getAttribute('data-index');
-            const { id, fullName, email, avatar } = processedUsers[index];
+            const { id, fullName, email } = processedUsers[index];
             const [first, last = ''] = fullName.split(' ');
-            const featuredUser = { id, first, last, email, position: 'Team Member', active: true, fullName, avatar };
+            const featuredUser = { id, first, last, email, position: 'Team Member', active: true, fullName };
             handleProfileUpdate(profileElement, featuredUser, logFn);
             logFn(`User displayed: ${featuredUser.fullName}`);
         });
@@ -59,7 +59,7 @@ const setupViewButtons = (processedUsers, profileElement, logFn) => {
 };
 
 const setupStateManagement = ({ initial, current }, stateManager, logFn) => {
-    console.log('Setting up state management with initial state:', stateManager.getState()); // Debug log
+    console.log('Setting up state management with initial state:', stateManager.getState());
     initial.textContent = JSON.stringify(stateManager.getState(), null, 2);
     current.textContent = JSON.stringify(stateManager.getState(), null, 2);
     stateManager.subscribe((state) => {
@@ -77,19 +77,19 @@ const createLogger = (consoleElement) => {
         logMessages.push({ time, message });
         consoleElement.textContent += `${time} - ${message}\n`;
         consoleElement.scrollTop = consoleElement.scrollHeight;
-        console.log(`Log: ${time} - ${message}`); // Debug log to console
+        console.log(`Log: ${time} - ${message}`);
         return logMessages;
     };
 };
 
 const formatLogs = (consoleElement, logMessages) => {
-    console.log('Formatting logs:', logMessages); // Debug log
+    console.log('Formatting logs:', logMessages);
     consoleElement.textContent = logMessages.map(msg => `${msg.time} - ${msg.message}`).join('\n');
     consoleElement.scrollTop = consoleElement.scrollHeight;
 };
 
 const exportData = async (consoleElement, processedUsers, currentUser, stateManager, logFn) => {
-    console.log('Exporting data...'); // Debug log
+    console.log('Exporting data...');
     const posts = await fetchUserPosts(1);
     consoleElement.textContent = `
 Team Members: ${JSON.stringify(processedUsers, null, 2)}
@@ -113,7 +113,7 @@ const handleRefresh = async (postsListElement, logFn) => {
 };
 
 const initializeApp = async () => {
-    console.log('Initializing app...'); // Debug log
+    console.log('Initializing app...');
     const processedUsers = processUserData(users);
     const usersTable = document.getElementById('processed-users');
     const postsList = document.getElementById('user-posts');
@@ -132,7 +132,7 @@ const initializeApp = async () => {
     log('System initialized');
     log(`Loaded ${processedUsers.length} team members`);
 
-    console.log('Processed users:', processedUsers); // Debug log
+    console.log('Processed users:', processedUsers);
     initUsersTable(processedUsers, usersTable);
 
     try {
