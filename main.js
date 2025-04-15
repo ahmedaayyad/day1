@@ -2,6 +2,7 @@ import { processUserData, fetchUserPosts, createUserProfileHTML, createStateMana
 import { users, sampleUser } from './data.js';
 
 const initUsersTable = (processedUsers, tableElement) => {
+    console.log('Initializing users table with:', processedUsers); // Debug log
     processedUsers.forEach((user, index) => {
         const { id, fullName, email } = user;
         const row = document.createElement('tr');
@@ -13,18 +14,22 @@ const initUsersTable = (processedUsers, tableElement) => {
         `;
         tableElement.appendChild(row);
     });
+    console.log('Users table initialized:', tableElement.innerHTML); // Debug log
 };
 
 const displayUserPosts = (postsListElement, postTitles) => {
+    console.log('Displaying posts:', postTitles); // Debug log
     postsListElement.innerHTML = '';
     postTitles.slice(0, 8).forEach((title) => {
         const li = document.createElement('li');
         li.textContent = `${title.substring(0, 50)}${title.length > 50 ? '...' : ''}`;
         postsListElement.appendChild(li);
     });
+    console.log('Posts list updated:', postsListElement.innerHTML); // Debug log
 };
 
 const handleProfileUpdate = (profileElement, user, logFn) => {
+    console.log('Updating profile for user:', user); // Debug log
     profileElement.innerHTML = createUserProfileHTML(user);
     const toggleBtn = profileElement.querySelector('.toggle-status-btn');
     if (toggleBtn) {
@@ -34,10 +39,14 @@ const handleProfileUpdate = (profileElement, user, logFn) => {
             logFn(`User status toggled: ${user.fullName} is now ${user.active ? 'Active' : 'Inactive'}`);
         });
     }
+    console.log('Profile updated:', profileElement.innerHTML); // Debug log
 };
 
 const setupViewButtons = (processedUsers, profileElement, logFn) => {
-    document.querySelectorAll('.view-btn').forEach(button => {
+    console.log('Setting up view buttons for users:', processedUsers); // Debug log
+    const buttons = document.querySelectorAll('.view-btn');
+    console.log('Found view buttons:', buttons); // Debug log
+    buttons.forEach(button => {
         button.addEventListener('click', (e) => {
             const index = e.target.getAttribute('data-index');
             const { id, fullName, email, avatar } = processedUsers[index];
@@ -50,10 +59,101 @@ const setupViewButtons = (processedUsers, profileElement, logFn) => {
 };
 
 const setupStateManagement = ({ initial, current }, stateManager, logFn) => {
+    console.log('Setting up state management with initial state:', stateManager.getState()); // Debug log
     initial.textContent = JSON.stringify(stateManager.getState(), null, 2);
     current.textContent = JSON.stringify(stateManager.getState(), null, 2);
     stateManager.subscribe((state) => {
         current.textContent = JSON.stringify(state, null, 2);
         logFn(`State updated: ${JSON.stringify(state)}`);
     });
-    setTimeout(() => stateManager.setState({ status
+    setTimeout(() => stateManager.setState({ status: 'Active' }), 1000);
+    setTimeout(() => stateManager.setState({ lastSeen: new Date().toLocaleString() }), 2000);
+};
+
+const createLogger = (consoleElement) => {
+    const logMessages = [];
+    return (message) => {
+        const time = new Date().toLocaleTimeString();
+        logMessages.push({ time, message });
+        consoleElement.textContent += `${time} - ${message}\n`;
+        consoleElement.scrollTop = consoleElement.scrollHeight;
+        console.log(`Log: ${time} - ${message}`); // Debug log to console
+        return logMessages;
+    };
+};
+
+const formatLogs = (consoleElement, logMessages) => {
+    console.log('Formatting logs:', logMessages); // Debug log
+    consoleElement.textContent = logMessages.map(msg => `${msg.time} - ${msg.message}`).join('\n');
+    consoleElement.scrollTop = consoleElement.scrollHeight;
+};
+
+const exportData = async (consoleElement, processedUsers, currentUser, stateManager, logFn) => {
+    console.log('Exporting data...'); // Debug log
+    const posts = await fetchUserPosts(1);
+    consoleElement.textContent = `
+Team Members: ${JSON.stringify(processedUsers, null, 2)}
+User Profile: ${createUserProfileHTML(currentUser)}
+Initial State: ${JSON.stringify(stateManager.getState(), null, 2)}
+Recent Posts: ${JSON.stringify(posts.slice(0, 8), null, 2)}
+    `;
+    consoleElement.scrollTop = consoleElement.scrollHeight;
+    logFn('Data exported');
+};
+
+const handleRefresh = async (postsListElement, logFn) => {
+    logFn('Data refreshed');
+    try {
+        const titles = await fetchUserPosts(1);
+        displayUserPosts(postsListElement, titles);
+        logFn(`Refreshed ${titles.length} posts`);
+    } catch (error) {
+        logFn(`Refresh error: ${error.message}`);
+    }
+};
+
+const initializeApp = async () => {
+    console.log('Initializing app...'); // Debug log
+    const processedUsers = processUserData(users);
+    const usersTable = document.getElementById('processed-users');
+    const postsList = document.getElementById('user-posts');
+    const profileDisplay = document.getElementById('user-profile');
+    const consoleOutput = document.querySelector('.logs-card pre');
+    const stateElements = { initial: document.getElementById('initial-state'), current: document.getElementById('current-state') };
+    let currentFeaturedUser = sampleUser;
+
+    if (!usersTable || !postsList || !profileDisplay || !consoleOutput) {
+        console.error('One or more DOM elements not found:', { usersTable, postsList, profileDisplay, consoleOutput });
+        return;
+    }
+
+    const log = createLogger(consoleOutput);
+
+    log('System initialized');
+    log(`Loaded ${processedUsers.length} team members`);
+
+    console.log('Processed users:', processedUsers); // Debug log
+    initUsersTable(processedUsers, usersTable);
+
+    try {
+        const titles = await fetchUserPosts(1);
+        log(`Fetched ${titles.length} posts`);
+        displayUserPosts(postsList, titles);
+    } catch (error) {
+        log(`Error fetching posts: ${error.message}`);
+    }
+
+    handleProfileUpdate(profileDisplay, currentFeaturedUser, log);
+    setupViewButtons(processedUsers, profileDisplay, log);
+
+    const userState = createStateManager({ name: 'Alex', status: 'Inactive' });
+    setupStateManagement(stateElements, userState, log);
+
+    log(`Profile displayed: ${currentFeaturedUser.fullName}`);
+
+    document.getElementById('format-logs').addEventListener('click', () => formatLogs(consoleOutput, log('Formatting logs')));
+    document.getElementById('export-data').addEventListener('click', () => exportData(consoleOutput, processedUsers, currentFeaturedUser, userState, log));
+    document.querySelector('.refresh-btn').addEventListener('click', () => handleRefresh(postsList, log));
+};
+
+initializeApp().catch(error => console.error('App initialization failed:', error));
