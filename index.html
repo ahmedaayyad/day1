@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prime User Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="header-title">
+                    <h1>Prime Dashboard</h1>
+                    <p>Elite Management Solution</p>
+                </div>
+                <button class="action-btn refresh-btn" aria-label="Refresh dashboard data">Refresh</button>
+            </div>
+        </header>
+
+        <main class="dashboard-main">
+            <section class="dashboard-card team-card" aria-labelledby="team-heading">
+                <h2 id="team-heading">Team Members</h2>
+                <div class="table-container">
+                    <table role="grid">
+                        <thead>
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="processed-users"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="dashboard-card activity-card" aria-labelledby="activity-heading">
+                <h2 id="activity-heading">Recent Posts</h2>
+                <ul id="user-posts" class="posts-list" role="list"></ul>
+            </section>
+
+            <section class="dashboard-card profile-card" aria-labelledby="profile-heading">
+                <h2 id="profile-heading">User Profile</h2>
+                <div id="user-profile" class="profile-content"></div>
+            </section>
+
+            <section class="dashboard-card state-card" aria-labelledby="state-heading">
+                <h2 id="state-heading">System State</h2>
+                <div class="state-container">
+                    <article class="state-panel" aria-labelledby="initial-state-heading">
+                        <h3 id="initial-state-heading">Initial State</h3>
+                        <pre id="initial-state" aria-live="polite"></pre>
+                    </article>
+                    <article class="state-panel" aria-labelledby="current-state-heading">
+                        <h3 id="current-state-heading">Current State</h3>
+                        <pre id="current-state" aria-live="polite"></pre>
+                    </article>
+                </div>
+            </section>
+
+            <section class="dashboard-card logs-card" aria-labelledby="logs-heading">
+                <h2 id="logs-heading">System Logs</h2>
+                <div class="logs-controls">
+                    <button class="action-btn" id="format-logs" aria-label="Format log output">Format Logs</button>
+                    <button class="action-btn" id="export-data" aria-label="Export system data">Export Data</button>
+                </div>
+                <pre id="console-output" class="logs-output" aria-live="polite"></pre>
+            </section>
+        </main>
+    </div>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>
