@@ -1,6 +1,6 @@
 export const users = [
-    { id: 1, fullName: 'John Doe', email: 'john@example.com' },
-    { id: 2, fullName: 'Jane Smith', email: 'jane@example.com' }
+    { id: 1, fullName: 'John Doe', email: 'john@example.com', avatar: 'https://i.pravatar.cc/100?img=1' },
+    { id: 2, fullName: 'Jane Smith', email: 'jane@example.com', avatar: 'https://i.pravatar.cc/100?img=2' }
 ];
 
 export const sampleUser = {
@@ -10,5 +10,6 @@ export const sampleUser = {
     email: 'sample@example.com',
     position: 'Guest',
     active: true,
-    fullName: 'Sample User'
+    fullName: 'Sample User',
+    avatar: 'https://i.pravatar.cc/100?img=3'
 };
