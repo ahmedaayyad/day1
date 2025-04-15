@@ -1,23 +1,18 @@
-// Data transformation
 export const processUserData = (users) => users.map(user => ({ ...user, active: true }));
 
-// Async data fetching
-export const fetchUserPosts = (userId) => new Promise((resolve) => {
-    setTimeout(() => {
-        resolve([
-            'Post 1: Introduction to JavaScript',
-            'Post 2: Understanding ES6 Features',
-            'Post 3: Working with Promises',
-            'Post 4: Async/Await in Action',
-            'Post 5: State Management Basics',
-            'Post 6: React Patterns',
-            'Post 7: Modern Web Development',
-            'Post 8: JavaScript Best Practices'
-        ]);
-    }, 1000);
-});
+// Fetch actual user posts from JSONPlaceholder API
+export const fetchUserPosts = async (userId) => {
+    try {
+        const response = await fetch(`https://jsonplaceholder.typicode.com/posts?userId=${userId}`);
+        if (!response.ok) throw new Error('Failed to fetch posts');
+        const posts = await response.json();
+        return posts.map(post => post.title); // Extract and return post titles
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+        return []; // Return empty array on error
+    }
+};
 
-// Data transformation to HTML (Updated to use avatar)
 export const createUserProfileHTML = (user) => `
     <div class="profile-card">
         <img src="${user.avatar}" alt="Profile picture of ${user.fullName}" class="profile-pic${!user.active ? ' status-inactive' : ''}">
@@ -33,7 +28,6 @@ export const createUserProfileHTML = (user) => `
     </div>
 `;
 
-// State management
 export const createStateManager = (initialState) => {
     let state = { ...initialState };
     const subscribers = [];
