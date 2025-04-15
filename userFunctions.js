@@ -12,12 +12,16 @@ export const fetchUserPosts = async (userId) => {
         return posts.map(post => post.title);
     } catch (error) {
         console.error(`Error fetching posts for userId ${userId}:`, error.message);
-        return [];
+        // Fallback data if API fetch fails
+        return [
+            'Fallback Post 1: Introduction to JavaScript',
+            'Fallback Post 2: Understanding ES6 Features',
+            'Fallback Post 3: Working with Promises'
+        ];
     }
 };
 
 export const createUserProfileHTML = (user) => {
-    // Generate a random avatar using DiceBear with the user's fullName as the seed
     const avatarUrl = `https://api.dicebear.com/9.x/identicon/svg?seed=${encodeURIComponent(user.fullName)}`;
     return `
     <div class="profile-card">
